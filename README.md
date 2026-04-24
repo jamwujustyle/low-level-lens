@@ -31,4 +31,4 @@ It serves as the final project for:
 
 ## 📚 Documentation
 
-For a detailed breakdown of the requirements, system architecture, and development roadmap, please refer to the [Project Specification (SPEC.md)](SPEC.md).
+For a detailed breakdown of the requirements, system architecture, and development roadmap, please refer to the [Project Specification (SPEC.md)](docs/SPEC.md).
