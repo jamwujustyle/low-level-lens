@@ -11,7 +11,7 @@ By bridging these two domains, the project takes high-level arithmetic expressio
 
 ## 2. System Architecture
 
-The project is divided into three distinct layers across a modern tech stack (Go + Next.js/TypeScript):
+The project is divided into three distinct layers across a modern tech stack (Go + Vanilla JS/TS):
 
 ### Layer 1: The Compiler (Go)
 Responsible for parsing the arithmetic expressions and translating them into an Abstract Syntax Tree (AST), then generating custom Assembly instructions.
@@ -25,7 +25,7 @@ The custom "contract" between the compiler and the hardware emulator.
 *   **ISA Definition**: A minimal, register-based architecture containing fundamental instructions (LOAD, ADD, SUB, MUL, DIV, HALT).
 *   **State Machine (VCPU)**: A Go-based simulation of a CPU containing Registers (R0-R3), a Program Counter (PC), and Memory (RAM), executing generated binary opcodes.
 
-### Layer 3: The Frontend Emulator (Next.js / TypeScript)
+### Layer 3: The Frontend Emulator (Vanilla JS/TS)
 A web-based dashboard acting as a "Slow Motion CPU" to visualize the execution.
 *   **Human-Speed Execution**: A UI allowing the user to "Step" through the Fetch-Decode-Execute cycle.
 *   **Component Visualization**: Live updating grids for Memory, Register boxes, Data/Control Buses, and the ALU.
@@ -95,7 +95,7 @@ A minimal Register-Based Instruction Set to map AST nodes to CPU operations:
 2.  **Assembler**: Convert textual assembly into raw binary byte arrays for the VCPU.
 3.  **State Machine (VCPU)**: Create the Go struct mapping memory and registers, exposing a `Step()` function to execute one opcode at a time and tracking CPU state.
 
-### Phase 3: Presentation UI (Next.js)
+### Phase 3: Presentation UI (Vanilla JS/TS)
 1.  **Backend API**: Wrap the Go VCPU in a simple HTTP API (or execute via WebAssembly) to expose the CPU state after each `Step()`.
 2.  **UI Construction**: Build out the Memory Grid, Register File, and ALU representations using Tailwind CSS.
 3.  **Animations**: Implement the "Clock Speed" and "Step Mode" controls, triggering bus animations and state transitions based on the API responses.
@@ -107,7 +107,7 @@ A minimal Register-Based Instruction Set to map AST nodes to CPU operations:
 low-level-lens/
 ├── compiler/           # Go: The PoP Project (Lexer, Parser, Codegen, Semantics)
 ├── vcpu/               # Go: The Virtual CPU state machine & ISA opcodes
-├── interface/          # Next.js: The Architecture Visualization UI
+├── interface/          # Vanilla JS/TS: The Architecture Visualization UI
 ├── tests/              # Test cases (Valid, Invalid, Extensible cases)
 └── SPEC.md             # This specification document
 ```
