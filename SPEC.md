@@ -111,3 +111,15 @@ low-level-lens/
 ├── tests/              # Test cases (Valid, Invalid, Extensible cases)
 └── SPEC.md             # This specification document
 ```
+
+---
+
+## 8. Presentation Strategy & "The Nuance"
+
+To effectively demonstrate the ability to "navigate across the stack" and "interconnect everything" during the COSC 3510 presentation, use the following analogy to explain the architecture:
+
+*   **The OS/Application Layer (Vanilla JS/TS)**: The web UI acts as the Operating System's GUI. It provides the interface for interaction but does not perform the raw physical computation.
+*   **The Physical Processor (Go Engine)**: The Go backend represents the physical hardware layer. By using Go, you can demonstrate Instruction Set Architecture (ISA) design effectively, specifically how bytes are written to a virtual memory buffer.
+*   **The Interconnect (API/Bus)**: The communication between the TS frontend and Go backend represents the system Bus. When "Step" is clicked, the UI (OS) asks the Go engine (Processor): *"What is the state of the registers after the next instruction?"* The Go engine executes the logic and replies with the updated state (e.g., *"R0 is now 15, and the Program Counter is at 0x04"*).
+
+This explicit mapping makes Topic 3 (Types of Computer Buses) and Topic 4 (Instruction Cycle) incredibly intuitive for the audience to visualize and proves mastery over both software abstractions and hardware realities.
