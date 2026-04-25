@@ -2,8 +2,8 @@ package compiler
 
 import "strings"
 
-
 type TokenType int
+
 const (
 	TokenEOF TokenType = iota
 	TokenNumber
@@ -15,24 +15,25 @@ const (
 	TokenRParen
 	TokenIdent
 )
+
 type Token struct {
-	Type TokenType
+	Type    TokenType
 	Literal string
 }
 type Lexer struct {
-	input string
-	position int
+	input        string
+	position     int
 	readPosition int
-	ch byte
+	ch           byte
 }
 
 func NewLexer(input string) *Lexer {
-	l:= &Lexer{input: input}
+	l := &Lexer{input: input}
 	l.readChar()
 	return l
 }
 
-func newToken(tt TokenType, ch byte) Token{
+func newToken(tt TokenType, ch byte) Token {
 	return Token{Type: tt, Literal: string(ch)}
 }
 func (l *Lexer) NextToken() Token {
@@ -60,22 +61,22 @@ func (l *Lexer) NextToken() Token {
 			tok.Literal = l.readNumber()
 			tok.Type = TokenNumber
 			return tok
-		}else if isLetter(l.ch) {
-			ident:= l.readIdentifier()
+		} else if isLetter(l.ch) {
+			ident := l.readIdentifier()
 			tt := lookupIdent(ident)
 			if tt != TokenIdent {
 				tok.Type = tt
 				if tt == TokenNumber {
 					tok.Literal = strings.ToLower(ident)
 				} else {
-				tok.Literal = normalizeOperator(tt)
+					tok.Literal = normalizeOperator(tt)
 				}
-			}else {
+			} else {
 				tok.Type = TokenIdent
 				tok.Literal = ident
 			}
 			return tok
-		}else {
+		} else {
 			tok = newToken(TokenEOF, l.ch)
 		}
 	}
@@ -86,11 +87,11 @@ func (l *Lexer) NextToken() Token {
 func (l *Lexer) readChar() {
 	if l.readPosition >= len(l.input) {
 		l.ch = 0
-	}else {
+	} else {
 		l.ch = l.input[l.readPosition]
 	}
 	l.position = l.readPosition
-	l.readPosition +=1
+	l.readPosition += 1
 }
 func (l *Lexer) readNumber() string {
 	pos := l.position
@@ -101,7 +102,7 @@ func (l *Lexer) readNumber() string {
 	return l.input[pos:l.position]
 }
 func (l *Lexer) readIdentifier() string {
-	pos:= l.position
+	pos := l.position
 
 	for isLetter(l.ch) {
 		l.readChar()
@@ -121,29 +122,36 @@ func isDigit(ch byte) bool {
 func isLetter(ch byte) bool {
 	return 'a' <= ch && ch <= 'z' || 'A' <= ch && ch <= 'Z'
 }
+
 // takes keyword e.g. minus returns type(2)
 func lookupIdent(ident string) TokenType {
-	keywords:= map[string]TokenType{
-		"plus": TokenPlus,
-		"minus": TokenMinus,
-		"times": TokenStar,
+	keywords := map[string]TokenType{
+		"plus":    TokenPlus,
+		"minus":   TokenMinus,
+		"times":   TokenStar,
 		"divided": TokenSlash,
-		"x": TokenNumber,
-		"v": TokenNumber,
-		"i": TokenNumber,
+		"x":       TokenNumber,
+		"v":       TokenNumber,
+		"i":       TokenNumber,
 	}
-	if tok, ok:= keywords[strings.ToLower(ident)]; ok {
+	if tok, ok := keywords[strings.ToLower(ident)]; ok {
 		return tok
 	}
 	return TokenIdent
 }
+
 // takes type (2) returns operator ("+", "")
 func normalizeOperator(t TokenType) string {
 	switch t {
-	case TokenPlus: return "+"
-	case TokenMinus: return "-"
-	case TokenStar: return "*"
-	case TokenSlash: return "/"
-	default : return ""
+	case TokenPlus:
+		return "+"
+	case TokenMinus:
+		return "-"
+	case TokenStar:
+		return "*"
+	case TokenSlash:
+		return "/"
+	default:
+		return ""
 	}
 }
