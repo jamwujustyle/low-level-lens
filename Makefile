@@ -1,4 +1,4 @@
-.DEFAULT_GOAL := run
+.DEFAULT_GOAL := check
 
 build:
 	go build -o bin/api ./cmd/api/main.go
