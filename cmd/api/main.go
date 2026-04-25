@@ -7,15 +7,15 @@ import (
 )
 
 func main() {
-	i := "X PluS 3 (2 / 3)"
+	i := "(10 PluS 3) * 2"
 
 	l := c.NewLexer(i)
 
-	for {
-		tok := l.NextToken()
-		if tok.Type == c.TokenEOF {
-			break
-		}
-		fmt.Printf("Type: %d, Literal: %s\n", tok.Type, tok.Literal)
+	p := c.NewParser(l)
+
+	tree := p.ParseExpression(c.LOWEST)
+
+	if tree != nil {
+		fmt.Printf("AST Structure: %s\n", tree.String())
 	}
 }

@@ -18,15 +18,15 @@
     - Case-insensitive Roman numeral support (`I`, `V`, `X`).
 - **Testing**: Standalone entry point implemented in `cmd/test-lexer/main.go`.
 
+### 3. Parser (Phase 1, Step 6)
+- **AST Definitions**: Created structures for Expression nodes, Number nodes, and Binary Operation nodes.
+- **Recursive Descent Parser**: Implemented logic to handle operator precedence (order of operations) using Pratt parsing.
+
 ---
 
 ## 🚀 Remaining Tasks
 
-### 1. Parser (Phase 1, Step 6)
-- [ ] **AST Definitions**: Create structures for Expression nodes, Number nodes, and Binary Operation nodes.
-- [ ] **Recursive Descent Parser**: Implement logic to handle operator precedence (order of operations).
-
-### 2. Semantic Analysis
+### 1. Semantic Analysis
 - [ ] **Validation**: Traverse the AST to catch errors like "Division by Zero" before execution.
 
 ### 3. Virtual CPU & Codegen (Phase 2)

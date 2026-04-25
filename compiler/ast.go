@@ -2,6 +2,7 @@ package compiler
 
 type Node interface {
 	TokenLiteral() string
+	String() string
 }
 
 type Expression interface {
@@ -28,4 +29,10 @@ func (il *IntegerLiteral) TokenLiteral() string {
 func (ix *InfixExpression) expressionNode() {}
 func (ix *InfixExpression) TokenLiteral() string {
 	return ix.Token.Literal
+}
+
+func (il *IntegerLiteral) String() string { return il.TokenLiteral() }
+
+func (ix *InfixExpression) String() string {
+	return "(" + ix.Left.String() + " " + ix.Operator + " " + ix.Right.String() + ")"
 }

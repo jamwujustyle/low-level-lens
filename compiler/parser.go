@@ -47,6 +47,7 @@ func NewParser(l *Lexer) *Parser {
 	}
 
 	p.registerPrefix(TokenNumber, p.parseIntegerLiteral)
+	p.registerPrefix(TokenLParen, p.parseGroupedExpression)
 
 	p.registerInfix(TokenPlus, p.ParseInfixExpression)
 	p.registerInfix(TokenMinus, p.ParseInfixExpression)
@@ -64,20 +65,6 @@ func (p *Parser) nextToken() {
 	p.peekToken = p.l.NextToken()
 }
 
-func (p *Parser) parseIntegerLiteral() Expression {
-	il := &IntegerLiteral{Token: p.curToken}
-
-	n, err := strconv.ParseInt(p.curToken.Literal, 10, 64)
-
-	if err != nil {
-		slog.Error("Error while type casting", "err", err)
-	}
-
-	il.Value = n
-
-	return il
-}
-
 func (p *Parser) peekPrecendence() int {
 	if p, ok := precedences[p.peekToken.Type]; ok {
 		return p
@@ -89,6 +76,14 @@ func (p *Parser) curPrecedence() int {
 		return p
 	}
 	return LOWEST
+}
+
+func (p *Parser) expectPeek(t TokenType) bool {
+	if p.peekToken.Type == t {
+		p.nextToken()
+		return true
+	}
+	return false
 }
 
 func (p *Parser) ParseExpression(precedence int) Expression {
@@ -121,4 +116,29 @@ func (p *Parser) ParseInfixExpression(left Expression) Expression {
 	ix.Right = p.ParseExpression(cp)
 
 	return ix
+}
+
+func (p *Parser) parseIntegerLiteral() Expression {
+	il := &IntegerLiteral{Token: p.curToken}
+
+	n, err := strconv.ParseInt(p.curToken.Literal, 10, 64)
+
+	if err != nil {
+		slog.Error("Error while type casting", "err", err)
+	}
+
+	il.Value = n
+
+	return il
+}
+
+func (p *Parser) parseGroupedExpression() Expression {
+	p.nextToken()
+
+	exp := p.ParseExpression(LOWEST)
+
+	if !p.expectPeek(TokenRParen) {
+		return nil
+	}
+	return exp
 }
