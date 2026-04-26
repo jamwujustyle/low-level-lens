@@ -1,5 +1,7 @@
 .DEFAULT_GOAL := check
 
+.PHONY build run test clean check
+
 build:
 	go build -o bin/api ./cmd/api/main.go
 
