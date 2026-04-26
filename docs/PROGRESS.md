@@ -22,12 +22,13 @@
 - **AST Definitions**: Created structures for Expression nodes, Number nodes, and Binary Operation nodes.
 - **Recursive Descent Parser**: Implemented logic to handle operator precedence (order of operations) using Pratt parsing.
 
+### 4. Semantic Analysis
+- **Validation**: Implemented an Evaluator to traverse the AST and mathematically catch errors like "Division by Zero" at compile time.
+
 ---
 
 ## 🚀 Remaining Tasks
 
-### 1. Semantic Analysis
-- [ ] **Validation**: Traverse the AST to catch errors like "Division by Zero" before execution.
 
 ### 3. Virtual CPU & Codegen (Phase 2)
 - [ ] **Code Generation**: Translate the AST into the custom ISA assembly.
