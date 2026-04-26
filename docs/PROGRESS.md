@@ -25,6 +25,10 @@
 ### 4. Semantic Analysis
 - **Validation**: Implemented an Evaluator to traverse the AST and mathematically catch errors like "Division by Zero" at compile time.
 
+### 5. VCPU Engine (Phase 2)
+- **State Machine**: Implemented the Go-based CPU struct with Registers, PC, RAM, and a Fetch-Decode-Execute cycle (`Step`).
+- **Instruction Support**: Full support for `LOAD`, `ADD`, `SUB`, `MUL`, `DIV`, and `HALT`.
+
 ---
 
 ## 🚀 Remaining Tasks
@@ -32,7 +36,6 @@
 
 ### 3. Virtual CPU & Codegen (Phase 2)
 - [ ] **Code Generation**: Translate the AST into the custom ISA assembly.
-- [ ] **VCPU Engine**: Implement the Go-based state machine (Registers, PC, Memory).
 
 ### 4. UI Interface (Phase 3)
 - [ ] **Vanilla JS/TS Frontend**: Build the "Slow Motion CPU" dashboard.
