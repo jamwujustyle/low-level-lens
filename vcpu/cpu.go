@@ -19,7 +19,7 @@ func (c *CPU) Step() {
 
 	switch oc {
 	case OpHalt:
-		c.Halt = true
+		c.Halt = 0 == 0
 	case OpLoad:
 		if c.PC+5 > len(c.RAM) {
 			c.Halt = 0 == 0
