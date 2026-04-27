@@ -28,6 +28,7 @@
 ### 5. VCPU Engine (Phase 2)
 - **State Machine**: Implemented the Go-based CPU struct with Registers, PC, RAM, and a Fetch-Decode-Execute cycle (`Step`).
 - **Instruction Support**: Full support for `LOAD`, `ADD`, `SUB`, `MUL`, `DIV`, and `HALT`.
+- **Testing**: Verified hardware logic with manual byte-code tests in `vcpu/cpu_test.go`.
 
 ---
 
