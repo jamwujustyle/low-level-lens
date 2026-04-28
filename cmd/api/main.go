@@ -5,11 +5,13 @@ import (
 	"os"
 	"strings"
 
+	logger "github.com/jamwujustyle/logger"
 	c "github.com/jamwujustyle/low-level-lens/compiler"
 	"github.com/jamwujustyle/low-level-lens/vcpu"
 )
 
 func main() {
+	logger.InitLogger(false)
 	i := "(10 + 5) * 2"
 
 	fmt.Println("Source Code:", i)
