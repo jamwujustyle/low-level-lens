@@ -2,28 +2,51 @@ package main
 
 import (
 	"fmt"
-	"log/slog"
+	"os"
+	"strings"
 
 	c "github.com/jamwujustyle/low-level-lens/compiler"
+	"github.com/jamwujustyle/low-level-lens/vcpu"
 )
 
 func main() {
-	i := "10 / (5 - 5)"
+	i := "(10 + 5) * 2"
+
+	fmt.Println("Source Code:", i)
 
 	l := c.NewLexer(i)
-
 	p := c.NewParser(l)
-
 	tree := p.ParseExpression(c.LOWEST)
+	fmt.Println("AST Structure: ", tree.String())
 
-	if tree != nil {
-		fmt.Printf("AST Structure: %s\n", tree.String())
-	}
-	r, err := c.Evaluate(tree)
+	_, err := c.Evaluate(tree)
+
 	if err != nil {
-		slog.Error("error evaluating", "err", err)
+		fmt.Println("COMPILER ERROR:", err)
+		return
 	}
 
-	fmt.Printf("result %d\n", r)
+	comp := c.NewCompiler()
+
+	comp.Compile(tree, 0)
+	comp.Emit(vcpu.OpHalt)
+
+	fmt.Println("\n--- GENERATED ASSEMBLY ---")
+	for _, line := range comp.Assembly {
+		fmt.Println(line)
+	}
+	fmt.Println("HALT")
+
+	asmContent := strings.Join(comp.Assembly, "\n") + "\nHALT\n"
+	os.WriteFile("output.asm", []byte(asmContent), 0644)
+	fmt.Println("\nAssembly saved to output.asm")
+
+	cpu := &vcpu.CPU{RAM: comp.Instructions}
+
+	for !cpu.Halt {
+		cpu.Step()
+	}
+
+	fmt.Printf("Final Result (R0): %d\n", cpu.Registers[0])
 
 }
