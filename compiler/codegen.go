@@ -37,6 +37,28 @@ func (c *Compiler) Compile(node Node, targetReg byte) {
 		c.Log(fmt.Sprintf("LOAD R%d, %d", targetReg, n.Value))
 	case *InfixExpression:
 
+		c.Compile(n.Left, targetReg)
+		c.Compile(n.Right, targetReg+1)
+
+		var op byte
+		var mnemonic string
+
+		switch n.Operator {
+		case "+":
+			op, mnemonic = vcpu.OpAdd, "ADD"
+		case "-":
+			op, mnemonic = vcpu.OpSub, "SUB"
+		case "*":
+			op, mnemonic = vcpu.OpMul, "MUL"
+		case "/":
+			op, mnemonic = vcpu.OpDiv, "DIV"
+		}
+		c.Emit(op)
+		c.Emit(targetReg)
+		c.Emit(targetReg + 1)
+
+		c.Log(fmt.Sprintf("%s R%d, R%d", mnemonic, targetReg, targetReg+1))
+
 	}
 
 }
