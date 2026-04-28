@@ -3,6 +3,7 @@ package compiler
 import (
 	"log/slog"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -121,10 +122,20 @@ func (p *Parser) ParseInfixExpression(left Expression) Expression {
 func (p *Parser) parseIntegerLiteral() Expression {
 	il := &IntegerLiteral{Token: p.curToken}
 
-	n, err := strconv.ParseInt(p.curToken.Literal, 10, 64)
-
-	if err != nil {
-		slog.Error("Error while type casting", "err", err)
+	var n int64
+	var err error
+	switch strings.ToLower(p.curToken.Literal) {
+	case "i":
+		n = 1
+	case "v":
+		n = 5
+	case "x":
+		n = 10
+	default:
+		n, err = strconv.ParseInt(p.curToken.Literal, 10, 64)
+		if err != nil {
+			slog.Error("Error while type casting", "err", err)
+		}
 	}
 
 	il.Value = n
