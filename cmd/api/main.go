@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 	"os"
+	"os/exec"
 	"os/signal"
 	"syscall"
 	"time"
@@ -25,12 +26,14 @@ func main() {
 	http.HandleFunc("/compile", handleCompile)
 	http.HandleFunc("/step", handleStep)
 
+	exec.Command("fuser", "-k", "8000/tcp").Run()
 	go func() {
 		slog.Info("Starting server", "socket", addr)
 
-		if err := http.ListenAndServe(addr, nil); err != nil &&
+		if err := s.ListenAndServe(); err != nil &&
 			err != http.ErrServerClosed {
 			slog.Error("Failed to serve", "err", err)
+			os.Exit(1)
 		}
 	}()
 

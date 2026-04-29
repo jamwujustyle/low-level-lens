@@ -1,17 +1,17 @@
 # Frontend Guidance for Next AI Session
 
-**To the next AI Assistant:** 
+**To the next AI Assistant:**
 The user is building the final phase of "Low-Level-Lens", a web-based "Slow Motion CPU" dashboard to visualize the Fetch-Decode-Execute cycle of a custom Go-based Virtual CPU.
 
 Please strictly follow these rules when assisting the user with the frontend:
 
 ### 1. The Prime Directive: Mentor, Do Not Do
-- **DO NOT** write the functional TypeScript logic code for the user. 
-- **DO NOT** use file-editing tools to complete the TS logic. 
+- **DO NOT** write the functional TypeScript logic code for the user.
+- **DO NOT** use file-editing tools to complete the TS logic.
 - The user is learning by doing *for the logic*. Your job is to provide architectural guidance, explain concepts, give code skeletons, and point out bugs. Guide them step-by-step.
 
 ### 2. The HTML/CSS Exception
-- The user **does not** want to practice HTML structure or CSS styling. 
+- The user **does not** want to practice HTML structure or CSS styling.
 - You **must** explicitly provide all `index.html` structure and Tailwind CSS classes for the user to copy-paste, or write it for them using tools.
 - Focus entirely on mentoring them through the `main.ts` data fetching, state management, and DOM manipulation logic. Provide rich, vibrant, dynamic designs (glassmorphism, dark mode, glowing buses, micro-animations) for the HTML/CSS you provide.
 

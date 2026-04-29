@@ -4,10 +4,174 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>interface</title>
+    <meta name="description" content="Low-Level-Lens: A Slow Motion CPU dashboard that visualizes the Fetch-Decode-Execute cycle of a custom Virtual CPU." />
+    <title>Low-Level-Lens — Slow Motion CPU</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+
+      <!-- ═══ HEADER ═══ -->
+      <header class="header">
+        <div class="header__logo">
+          <div class="header__icon">🔬</div>
+          <div>
+            <div class="header__title">Low-Level-Lens</div>
+            <div class="header__subtitle">Slow Motion CPU</div>
+          </div>
+        </div>
+        <div class="header__status">
+          <span class="header__dot" id="status-dot"></span>
+          <span id="status-text">Connecting…</span>
+        </div>
+      </header>
+
+      <!-- ═══ MAIN DASHBOARD ═══ -->
+      <main class="dashboard">
+
+        <!-- ── Left Column: Code Input ── -->
+        <section class="panel code-input">
+          <div class="panel__header">
+            <div class="panel__title">
+              <span class="panel__title-dot" style="background: var(--accent)"></span>
+              Source Expression
+            </div>
+          </div>
+          <div class="panel__body">
+            <textarea
+              id="code-textarea"
+              class="code-input__textarea"
+              placeholder="Type an expression…&#10;&#10;  (10 + 5) * 2&#10;  X plus V&#10;  8 * (3 - 1)"
+              spellcheck="false"
+              autocomplete="off"
+            ></textarea>
+            <button id="btn-compile" class="btn btn--primary">
+              ⚡ Compile
+            </button>
+
+            <!-- Memory dump appears here after compile -->
+            <div id="memory-container" class="memory-view" style="display: none;">
+              <div class="memory-view__title">RAM (Hex)</div>
+              <div id="memory-grid" class="memory-grid"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── Right Top: Assembly View ── -->
+        <section class="panel assembly-view">
+          <div class="panel__header">
+            <div class="panel__title">
+              <span class="panel__title-dot" style="background: var(--cyan)"></span>
+              Assembly
+            </div>
+            <div id="pc-badge" class="pc-display" style="display: none;">
+              <span class="pc-display__label">PC</span>
+              <span class="pc-display__value" id="pc-value">0x00</span>
+            </div>
+          </div>
+          <div class="panel__body">
+            <ul id="assembly-list" class="assembly__list">
+              <li class="assembly__empty">Compile an expression to see assembly…</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- ── Right Bottom: CPU Core ── -->
+        <section class="panel cpu-core">
+          <div class="panel__header">
+            <div class="panel__title">
+              <span class="panel__title-dot" style="background: var(--green)"></span>
+              CPU Core
+            </div>
+            <span id="cpu-status" class="status-badge status-badge--idle">Idle</span>
+          </div>
+          <div class="panel__body">
+
+            <!-- FDE Phase Indicator -->
+            <div class="phase-indicator">
+              <div id="phase-fetch" class="phase-indicator__step phase-indicator__step--fetch">
+                Fetch
+              </div>
+              <div id="phase-decode" class="phase-indicator__step phase-indicator__step--decode">
+                Decode
+              </div>
+              <div id="phase-execute" class="phase-indicator__step phase-indicator__step--execute">
+                Execute
+              </div>
+            </div>
+
+            <!-- Bus Line -->
+            <div id="data-bus" class="bus-line"></div>
+
+            <!-- CPU Internals -->
+            <div class="cpu-internals">
+
+              <!-- Registers -->
+              <div class="register-file">
+                <div class="register-file__title">Registers</div>
+                <div class="register" id="reg-r0">
+                  <span class="register__name">R0</span>
+                  <span class="register__value" id="r0-value">0</span>
+                </div>
+                <div class="register" id="reg-r1">
+                  <span class="register__name">R1</span>
+                  <span class="register__value" id="r1-value">0</span>
+                </div>
+                <div class="register" id="reg-r2">
+                  <span class="register__name">R2</span>
+                  <span class="register__value" id="r2-value">0</span>
+                </div>
+                <div class="register" id="reg-r3">
+                  <span class="register__name">R3</span>
+                  <span class="register__value" id="r3-value">0</span>
+                </div>
+              </div>
+
+              <!-- ALU -->
+              <div class="alu" id="alu">
+                <div class="alu__shape">
+                  <span class="alu__label">ALU</span>
+                </div>
+                <span class="alu__op" id="alu-op"></span>
+              </div>
+
+            </div>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- ═══ CONTROL BAR ═══ -->
+      <div class="control-bar">
+        <div class="control-bar__info">
+          <div class="control-bar__cycle">
+            Cycle: <span id="cycle-count">0</span>
+          </div>
+        </div>
+        <div class="btn-group">
+          <button id="btn-step" class="btn btn--accent" disabled>
+            ▶ Step
+          </button>
+          <button id="btn-reset" class="btn btn--danger" disabled>
+            ↺ Reset
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ HALT OVERLAY ═══ -->
+    <div id="halt-overlay" class="halt-overlay">
+      <div class="halt-overlay__card">
+        <div class="halt-overlay__title">⛔ HALT</div>
+        <div class="halt-overlay__sub">Execution Complete</div>
+        <div class="halt-overlay__result" id="halt-result">0</div>
+        <button id="btn-dismiss" class="btn btn--secondary">Dismiss</button>
+      </div>
+    </div>
+
+    <!-- ═══ ERROR TOAST ═══ -->
+    <div id="error-toast" class="error-toast"></div>
+
     <script type="module" src="/src/main.ts"></script>
   </body>
 </html>
