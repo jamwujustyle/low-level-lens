@@ -16,6 +16,7 @@ func main() {
 
 	http.HandleFunc("/ping", handlePing)
 	http.HandleFunc("/compile", handleCompile)
+	http.HandleFunc("/step", handleStep)
 
 	if err := http.ListenAndServe(addr, nil); err != nil {
 		slog.Error("Failed to serve", "err", err)
