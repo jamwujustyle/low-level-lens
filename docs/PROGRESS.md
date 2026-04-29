@@ -32,11 +32,14 @@
 
 ---
 
+### 6. Code Generation (Phase 2)
+- **AST Walking**: Implemented recursive tree-walking to translate AST nodes into linear VCPU instructions.
+- **Assembly Logging**: Added human-readable `.asm` generation alongside binary machine code.
+- **Extended ISA**: Successfully implemented a custom `OpExp` (Exponentiation) instruction across the entire stack.
+
+---
+
 ## 🚀 Remaining Tasks
-
-
-### 3. Virtual CPU & Codegen (Phase 2)
-- [ ] **Code Generation**: Translate the AST into the custom ISA assembly.
 
 ### 4. UI Interface (Phase 3)
 - [ ] **Vanilla JS/TS Frontend**: Build the "Slow Motion CPU" dashboard.
