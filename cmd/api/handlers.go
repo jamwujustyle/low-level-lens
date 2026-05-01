@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"errors"
+	"log/slog"
 	"net/http"
 
 	c "github.com/jamwujustyle/low-level-lens/compiler"
@@ -11,17 +12,17 @@ import (
 
 func handlePing(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
-
+	slog.Info("handlePing invoked")
 	if err := json.NewEncoder(w).Encode(map[string]string{"message": "ping"}); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 	}
 }
 
 func handleCompile(w http.ResponseWriter, r *http.Request) {
+	slog.Info("handleCompile invoked with", "body", r.Body)
+
 	var req CompileRequest
 	var res CompileResponse
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -53,8 +54,9 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleStep(w http.ResponseWriter, r *http.Request) {
+	slog.Info("handleStep invoked with")
+
 	w.Header().Set("Content-Type", "application/json")
-	w.Header().Set("Access-Control-Allow-Origin", "*")
 	if gCPU == nil {
 		err := errors.New("CPU not initialized")
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -70,5 +72,20 @@ func handleStep(w http.ResponseWriter, r *http.Request) {
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
+func corsMIddleware(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next(w, r)
 	}
 }

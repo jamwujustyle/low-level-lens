@@ -22,9 +22,9 @@ func main() {
 
 	s := &http.Server{Addr: addr}
 
-	http.HandleFunc("/ping", handlePing)
-	http.HandleFunc("/compile", handleCompile)
-	http.HandleFunc("/step", handleStep)
+	http.HandleFunc("/ping", corsMIddleware(handlePing))
+	http.HandleFunc("/compile", corsMIddleware(handleCompile))
+	http.HandleFunc("/step", corsMIddleware(handleStep))
 
 	exec.Command("fuser", "-k", "8000/tcp").Run()
 	go func() {
