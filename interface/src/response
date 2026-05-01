@@ -1,0 +1,27 @@
+Read main.ts, lines 1 to 100
+
+Your main.ts has a solid start—good job setting up imports, state, and DOM caching. I see you're building the compile handler. Here are the key issues and fixes (focus on these bugs first, then we can add more logic):
+
+Bugs to Fix
+Fetch Method and URL:
+
+Your compile fetch uses method: "GET" with a body—that's invalid. The API expects POST (as per your handlers.go).
+URL has https://—change to http:// for localhost.
+Fix: method: "POST", url: 'http://localhost:8000/compile'.
+Duplicate State Variables:
+
+You have let state: AppState = {...} at the top, but then separate variables like let assembly: string[] = [] at the bottom. This creates confusion—use only the state object for consistency.
+Remove the bottom duplicates (assembly, registers, etc.) and update your handlers to use state.assembly, etc.
+Incomplete DOM Caching:
+
+Many variables are set to null (e.g., btnStep = null). Fill them in with getElementById calls, like you did for codeTextarea.
+Example: const btnStep = document.getElementById('btn-step') as HTMLButtonElement;
+Error Handling:
+
+Your try-catch is empty—add logic to show errors in #error-toast (e.g., set innerText and toggle display).
+Next Steps
+Fix the compile fetch and test it (run the backend first with go run cmd/api/main.go).
+After compile succeeds, update the DOM: Populate #assembly-list with <li> elements from state.assembly.
+Enable the step/reset buttons by setting disabled = false.
+Share your updated compile handler once fixed, and we'll tackle the step logic. You're on the right track—keep iterating! 🚀
+

@@ -1,25 +1,52 @@
 import './style.css'
 
+import type { CompileResponse, StepResponse, AppState } from './types'
+const API = 'http://localhost:8000'
+
 // ═══════════════════════════════════════════════════════════════
 // Low-Level-Lens — Main Application Entry
 // ═══════════════════════════════════════════════════════════════
-//
-// YOUR MISSION:
-// Wire up the UI to the Go API at http://localhost:8000
-//
-// API Endpoints:
 //   POST /compile  → body: { expression: string }
 //                  ← { assembly: string[], message?: string }
-//
 //   POST /step     → no body needed
 //                  ← { registers: number[], pc: number, halt: boolean }
-//
-// Below is the skeleton. Fill in every function marked with
-// 🏗️ TODO — the comments explain exactly what to do.
-// ═══════════════════════════════════════════════════════════════
 
-const API = 'http://localhost:8000'
+let state: AppState = {
+      assembly: [],
+    pc: 0,
+    registers: [0,0,0,0],
+    cycle: 0,
+    isCompiled: false,
+    isHalted: false,
+}
 
+const codeTextarea = document.getElementById("code-textarea") as HTMLTextAreaElement
+const compileBtn = document.getElementById("btn-compile") as HTMLButtonElement
+const stepBtn = document.getElementById("btn-step") as HTMLButtonElement
+const resetBtn = document.getElementById("btn-reset") as HTMLButtonElement
+const dismissBtn = document.getElementById("btn-dismiss") as HTMLButtonElement
+const assemblyList = document.getElementById("assembly-list") as HTMLDataListElement
+
+compileBtn.addEventListener("click", async () => {
+  const expression = codeTextarea.value.trim();
+  if (!expression) return;
+
+
+  try {
+    const response = await fetch('https://localhost:8000/compile', {
+      method: "GET",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({expression})
+    });
+    const data: CompileResponse = await response.json();
+
+    state.assembly = data.assembly
+    state.isCompiled = true
+  }catch (error) {
+    
+  }
+
+})
 // ── DOM References ────────────────────────────────────────────
 // Grab every element you'll need to read from or write to.
 // They all have unique IDs in index.html — use getElementById
@@ -28,11 +55,8 @@ const API = 'http://localhost:8000'
 // 🏗️ TODO: Fill in each variable below.
 //    Example: const codeTextarea = document.getElementById('code-textarea') as HTMLTextAreaElement
 //
-const codeTextarea    = null  // the <textarea> where user types expressions
-const btnCompile      = null  // "Compile" button
 const btnStep         = null  // "Step" button
 const btnReset        = null  // "Reset" button
-const assemblyList    = null  // <ul> that holds assembly lines
 const pcBadge         = null  // PC display container
 const pcValue         = null  // the <span> showing the hex PC value
 const regValues       = null  // array of the 4 register value <span>s: [r0-value, r1-value, ...]
