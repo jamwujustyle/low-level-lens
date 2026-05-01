@@ -43,5 +43,5 @@
 
 ### 4. UI Interface (Phase 3)
 - [x] **Go Backend API**: Wrapped the Compiler and VCPU in a standard REST HTTP API with CORS and Graceful Shutdown.
-- [ ] **Vanilla JS/TS Frontend**: Build the "Slow Motion CPU" dashboard (Vite project initialized!).
-- [ ] **Visualization**: Animate the Fetch-Decode-Execute cycle and Bus interactions.
+- [x] **Vanilla JS/TS Frontend**: Build the "Slow Motion CPU" dashboard (API integration, DOM linking, and compile rendering successful!).
+- [ ] **Visualization & Execution**: Implement the Step logic, update Registers/PC/Cycles on the UI, and animate the Bus interactions.
