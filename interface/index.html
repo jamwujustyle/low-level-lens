@@ -69,9 +69,15 @@
             </div>
           </div>
           <div class="panel__body">
-            <ul id="assembly-list" class="assembly__list">
-              <li class="assembly__empty">Compile an expression to see assembly…</li>
-            </ul>
+            <div class="asm-table__header">
+              <span class="asm-table__col asm-table__col--addr">Addr</span>
+              <span class="asm-table__col asm-table__col--opcode">Hex</span>
+              <span class="asm-table__col asm-table__col--mnemonic">Instruction</span>
+              <span class="asm-table__col asm-table__col--operands">Operands</span>
+            </div>
+            <div id="assembly-list" class="asm-table__body">
+              <div class="assembly__empty">Compile an expression to see assembly…</div>
+            </div>
           </div>
         </section>
 

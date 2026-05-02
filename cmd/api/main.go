@@ -25,6 +25,7 @@ func main() {
 	http.HandleFunc("/ping", corsMIddleware(handlePing))
 	http.HandleFunc("/compile", corsMIddleware(handleCompile))
 	http.HandleFunc("/step", corsMIddleware(handleStep))
+	http.HandleFunc("/reset", corsMIddleware(handleReset))
 
 	exec.Command("fuser", "-k", "8000/tcp").Run()
 	go func() {

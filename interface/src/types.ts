@@ -1,6 +1,15 @@
+interface Instruction {
+    address: string;
+    opcode: string;
+    mnemonic: string;
+    operands: string;
+    raw: string;
+}
+
 interface CompileResponse {
     message: string;
     assembly: string[];
+    instructions: Instruction[];
 }
 
 interface StepResponse {
@@ -11,6 +20,7 @@ interface StepResponse {
 
 interface AppState {
     assembly: string[];
+    instructions: Instruction[];
     pc: number;
     registers: number[];
     cycle: number;
@@ -18,4 +28,4 @@ interface AppState {
     isHalted: boolean;
 }
 
-export type { AppState, StepResponse, CompileResponse }
+export type { AppState, StepResponse, CompileResponse, Instruction }

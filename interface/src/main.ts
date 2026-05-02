@@ -1,10 +1,11 @@
 import './style.css'
 
-import type { CompileResponse, StepResponse, AppState } from './types'
+import type { CompileResponse, StepResponse, AppState, Instruction } from './types'
 const API = 'http://localhost:8000'
 
 let state: AppState = {
     assembly: [],
+    instructions: [],
     pc: 0,
     registers: [0,0,0,0],
     cycle: 0,
@@ -79,102 +80,148 @@ const phaseExecute = document.getElementById("phase-execute") as HTMLDivElement
 //      (idle / running / halted).
 //   6. If halted, show the halt overlay with R0's final value.
 //
-function render(): void {
-  assemblyList.innerHTML = ""
-
-  if (state.assembly.length === 0) {
-    assemblyList.innerHTML = `<li class="assembly__empty">Compile an expression to see assembly…</li>`
-    return
-  }
-
-  state.assembly.forEach((instruction, index) => {
-    const li = document.createElement("li")
-
-    li.textContent = instruction
-
-    li.classList.add("assembly__item")
-
-    if (index === state.cycle) {
-      li.classList.add("assembly__item--active")
-    }
-    assemblyList.appendChild(li)
-  }
-)
+function renderOperands(operands: string): string {
+  // Wrap register names (R0-R3) and immediate values in styled spans
+  return operands.replace(/\b(R[0-3])\b/g, '<span class="asm-operand--reg">$1</span>')
+                  .replace(/\b(\d+)\b/g, '<span class="asm-operand--imm">$1</span>')
 }
 
-// ── Compile Handler ───────────────────────────────────────────
-// When the user clicks "Compile":
-//   1. Read the textarea value
-//   2. POST it to /compile as JSON
-//   3. Parse the response
-//   4. Store assembly[] in state
-//   5. Reset registers, pc, cycle, halted
-//   6. Enable the Step + Reset buttons
-//   7. Call render()
-//
-// 🏗️ TODO: Implement this async function.
-//
-// HINT:
-//   const res = await fetch(`${API}/compile`, {
-//     method: 'POST',
-//     headers: { 'Content-Type': 'application/json' },
-//     body: JSON.stringify({ expression: ??? })
-//   })
-//
+function render(): void {
+  // 1. Assembly List
+  assemblyList.innerHTML = ""
+  if (state.instructions.length === 0) {
+    assemblyList.innerHTML = `<div class="assembly__empty">Compile an expression to see assembly…</div>`
+  } else {
+    state.instructions.forEach((inst: Instruction, index: number) => {
+      const row = document.createElement("div")
+      row.classList.add("asm-row")
+      if (index === state.cycle) {
+        row.classList.add("asm-row--active")
+        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+      }
+      const mnemonicClass = `asm-row__mnemonic--${inst.mnemonic.toLowerCase()}`
+      row.innerHTML = `
+        <span class="asm-row__addr">${inst.address}</span>
+        <span class="asm-row__opcode">${inst.opcode}</span>
+        <span class="asm-row__mnemonic ${mnemonicClass}">${inst.mnemonic}</span>
+        <span class="asm-row__operands">${renderOperands(inst.operands)}</span>
+      `
+      assemblyList.appendChild(row)
+    })
+  }
+
+  // 2. Registers
+  state.registers.forEach((val, i) => {
+    const prevVal = regValues[i].textContent
+    regValues[i].textContent = val.toString()
+    
+    if (prevVal !== val.toString() && state.cycle > 0) {
+      regContainers[i].classList.add("register--changed")
+      setTimeout(() => regContainers[i].classList.remove("register--changed"), 600)
+    }
+  })
+
+  // 3. PC & Cycle
+  pcValue.textContent = `0x${state.pc.toString(16).toUpperCase().padStart(2, '0')}`
+  pcBadge.style.display = state.isCompiled ? "flex" : "none"
+  cycleCount.textContent = state.cycle.toString()
+
+  // 4. CPU Status
+  if (state.isHalted) {
+    cpuStatus.textContent = "Halted"
+    cpuStatus.className = "status-badge status-badge--halted"
+    stepBtn.disabled = true
+    
+    // Show Halt Overlay
+    haltResult.textContent = state.registers[0].toString()
+    haltOverlay.classList.add("visible")
+  } else if (state.isCompiled) {
+    cpuStatus.textContent = "Running"
+    cpuStatus.className = "status-badge status-badge--running"
+    stepBtn.disabled = false
+  } else {
+    cpuStatus.textContent = "Idle"
+    cpuStatus.className = "status-badge status-badge--idle"
+    stepBtn.disabled = true
+    resetBtn.disabled = true
+  }
+}
 
 // ── Step Handler ──────────────────────────────────────────────
-// When the user clicks "Step":
-//   1. POST to /step (no body needed)
-//   2. Parse the response → { registers, pc, halt }
-//   3. Save previous registers (for change detection)
-//   4. Update state with new values
-//   5. Increment cycle
-//   6. Call render()
-//
-// 🏗️ TODO: Implement this async function.
-//
 async function handleStep(): Promise<void> {
-  // Your code here...
+  if (state.isHalted) return
+
+  try {
+    const res = await fetch(`${API}/step`, { method: 'POST' })
+    if (!res.ok) throw new Error(await res.text())
+    
+    const data: StepResponse = await res.json()
+    
+    state.registers = data.registers
+    state.pc = data.pc
+    state.isHalted = data.halt
+    state.cycle++
+    
+    render()
+  } catch (err: any) {
+    showError(err.message)
+  }
 }
 
 // ── Reset Handler ─────────────────────────────────────────────
-// When the user clicks "Reset":
-//   1. Zero out all state (registers, pc, cycle, halted, assembly)
-//   2. Disable Step + Reset buttons
-//   3. Call render()
-//
-// 🏗️ TODO: Implement this function.
-//
-function handleReset(): void {
-  // Your code here...
+async function handleReset(): Promise<void> {
+  try {
+    await fetch(`${API}/reset`, { method: 'POST' })
+    
+    state = {
+      assembly: [],
+      instructions: [],
+      pc: 0,
+      registers: [0,0,0,0],
+      cycle: 0,
+      isCompiled: false,
+      isHalted: false,
+    }
+    
+    codeTextarea.value = ""
+    haltOverlay.classList.remove("visible")
+    render()
+  } catch (err: any) {
+    showError(err.message)
+  }
 }
 
 // ── Error Display ─────────────────────────────────────────────
-// Shows the error toast for ~3 seconds.
-//
-// 🏗️ TODO: Implement this.
-//   1. Set errorToast's textContent
-//   2. Add the 'visible' class
-//   3. Use setTimeout to remove 'visible' after 3000ms
-//
 function showError(msg: string): void {
-  console.log(msg)
+  errorToast.textContent = msg
+  errorToast.classList.add("visible")
+  setTimeout(() => errorToast.classList.remove("visible"), 3000)
 }
 
 // ── Event Listeners ───────────────────────────────────────────
-// 🏗️ TODO: Attach click handlers to the buttons.
-//   btnCompile → handleCompile
-//   btnStep    → handleStep
-//   btnReset   → handleReset
-//   btnDismiss → hide halt overlay + call handleReset
-//
+stepBtn.addEventListener("click", handleStep)
+resetBtn.addEventListener("click", handleReset)
+dismissBtn.addEventListener("click", () => {
+  haltOverlay.classList.remove("visible")
+  handleReset()
+})
 
 // ── Boot ──────────────────────────────────────────────────────
-// 🏗️ TODO: On page load, ping the API to check connectivity.
-//   fetch(`${API}/ping`)
-//   If OK → set status dot to green, text to "Connected"
-//   If error → set dot class to 'header__dot--offline', text to "Offline"
-//
+async function boot() {
+  try {
+    const res = await fetch(`${API}/ping`)
+    if (res.ok) {
+      statusDot.classList.remove("header__dot--offline")
+      statusText.textContent = "Connected"
+    } else {
+      throw new Error()
+    }
+  } catch {
+    statusDot.classList.add("header__dot--offline")
+    statusText.textContent = "Offline"
+  }
+}
+boot()
 const handleCompile = async () => {
 const expression = codeTextarea.value.trim();
   if (!expression) return;
@@ -188,7 +235,13 @@ const expression = codeTextarea.value.trim();
     const data: CompileResponse = await response.json();
 
     state.assembly = data.assembly
+    state.instructions = data.instructions || []
     state.isCompiled = true
+    state.isHalted = false
+    state.registers = [0,0,0,0]
+    state.pc = 0
+    state.cycle = 0
+    
     stepBtn.disabled = false
     resetBtn.disabled = false
     render()

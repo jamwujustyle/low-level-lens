@@ -10,6 +10,15 @@ import (
 	"github.com/jamwujustyle/low-level-lens/vcpu"
 )
 
+func handleReset(w http.ResponseWriter, r *http.Request) {
+	slog.Info("handleReset invoked")
+	w.Header().Set("Content-Type", "application/json")
+	gCPU = nil
+	if err := json.NewEncoder(w).Encode(map[string]string{"message": "CPU reset successful"}); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	}
+}
+
 func handlePing(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	slog.Info("handlePing invoked")
@@ -46,7 +55,7 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	res = CompileResponse{Assembly: comp.Assembly}
+	res = CompileResponse{Message: "Compiled Successfully", Assembly: comp.Assembly, Instructions: buildInstructions(comp)}
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -54,7 +63,7 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 }
 
 func handleStep(w http.ResponseWriter, r *http.Request) {
-	slog.Info("handleStep invoked with")
+	slog.Info("handleStep invoked")
 
 	w.Header().Set("Content-Type", "application/json")
 	if gCPU == nil {
