@@ -15,10 +15,12 @@ type CompileResponse struct {
 	Message      string        `json:"message"`
 	Assembly     []string      `json:"assembly"`
 	Instructions []Instruction `json:"instructions"`
+	RAM          []byte        `json:"ram"`
 }
 
 type StepResponse struct {
 	Registers [4]int32 `json:"registers"`
 	PC        int      `json:"pc"`
 	Halt      bool     `json:"halt"`
+	RAM       []byte   `json:"ram"`
 }

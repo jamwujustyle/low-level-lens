@@ -8,6 +8,7 @@ let state: AppState = {
     instructions: [],
     pc: 0,
     registers: [0,0,0,0],
+    ram: [],
     cycle: 0,
     isCompiled: false,
     isHalted: false,
@@ -63,6 +64,16 @@ const phaseExecute = document.getElementById("phase-execute") as HTMLDivElement
 //
 
 
+// ── Helpers ───────────────────────────────────────────────────
+function base64ToBytes(base64: string): number[] {
+  const binaryString = atob(base64)
+  const bytes = new Uint8Array(binaryString.length)
+  for (let i = 0; i < binaryString.length; i++) {
+    bytes[i] = binaryString.charCodeAt(i)
+  }
+  return Array.from(bytes)
+}
+
 // ── Render Function ───────────────────────────────────────────
 // This is the CORE pattern. After every state change, call
 // render() to push state → DOM.
@@ -89,6 +100,7 @@ function renderOperands(operands: string): string {
 function render(): void {
   // 1. Assembly List
   assemblyList.innerHTML = ""
+  let activeRow: HTMLElement | null = null
   if (state.instructions.length === 0) {
     assemblyList.innerHTML = `<div class="assembly__empty">Compile an expression to see assembly…</div>`
   } else {
@@ -97,7 +109,7 @@ function render(): void {
       row.classList.add("asm-row")
       if (index === state.cycle) {
         row.classList.add("asm-row--active")
-        row.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+        activeRow = row
       }
       const mnemonicClass = `asm-row__mnemonic--${inst.mnemonic.toLowerCase()}`
       row.innerHTML = `
@@ -108,6 +120,27 @@ function render(): void {
       `
       assemblyList.appendChild(row)
     })
+    if (activeRow) (activeRow as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  }
+
+  // 1.5 Memory Grid
+  memoryGrid.innerHTML = ""
+  if (state.ram.length > 0) {
+    memoryContainer.style.display = "block"
+    let pcCell: HTMLElement | null = null
+    state.ram.forEach((byte, i) => {
+      const cell = document.createElement("div")
+      cell.classList.add("memory-cell")
+      if (i === state.pc) {
+        cell.classList.add("memory-cell--pc")
+        pcCell = cell
+      }
+      cell.textContent = byte.toString(16).toUpperCase().padStart(2, '0')
+      memoryGrid.appendChild(cell)
+    })
+    if (pcCell) (pcCell as HTMLElement).scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+  } else {
+    memoryContainer.style.display = "none"
   }
 
   // 2. Registers
@@ -126,7 +159,39 @@ function render(): void {
   pcBadge.style.display = state.isCompiled ? "flex" : "none"
   cycleCount.textContent = state.cycle.toString()
 
-  // 4. CPU Status
+  // 4. CPU Status & Phases
+  const currentInst = state.instructions[state.cycle - 1]
+  
+  // Reset phases
+  if (phaseFetch && phaseDecode && phaseExecute) {
+    [phaseFetch, phaseDecode, phaseExecute].forEach(p => p?.classList.remove("active"))
+  }
+  
+  if (aluEl) aluEl.classList.remove("alu--active")
+  if (aluOp) aluOp.textContent = ""
+  if (dataBus) dataBus.classList.remove("bus-line--active")
+
+  if (state.cycle > 0 && currentInst) {
+    // Trigger "Execute" visuals for the instruction that just ran
+    if (phaseExecute) phaseExecute.classList.add("active")
+    
+    // If it was an ALU operation, highlight the ALU
+    const isALU = ["ADD", "SUB", "MUL", "DIV"].includes(currentInst.mnemonic)
+    if (isALU && aluEl && aluOp) {
+      aluEl.classList.add("alu--active")
+      aluOp.textContent = currentInst.mnemonic
+    }
+
+    // Trigger bus animation
+    if (dataBus) {
+      dataBus.classList.add("bus-line--active")
+      setTimeout(() => dataBus.classList.remove("bus-line--active"), 800)
+    }
+  } else if (state.isCompiled && phaseFetch) {
+    // If just compiled, we're ready to "Fetch" the first instruction
+    phaseFetch.classList.add("active")
+  }
+
   if (state.isHalted) {
     cpuStatus.textContent = "Halted"
     cpuStatus.className = "status-badge status-badge--halted"
@@ -160,6 +225,7 @@ async function handleStep(): Promise<void> {
     state.registers = data.registers
     state.pc = data.pc
     state.isHalted = data.halt
+    state.ram = base64ToBytes(data.ram)
     state.cycle++
     
     render()
@@ -178,6 +244,7 @@ async function handleReset(): Promise<void> {
       instructions: [],
       pc: 0,
       registers: [0,0,0,0],
+      ram: [],
       cycle: 0,
       isCompiled: false,
       isHalted: false,
@@ -201,9 +268,18 @@ function showError(msg: string): void {
 // ── Event Listeners ───────────────────────────────────────────
 stepBtn.addEventListener("click", handleStep)
 resetBtn.addEventListener("click", handleReset)
-dismissBtn.addEventListener("click", () => {
+
+const dismissHalt = () => {
   haltOverlay.classList.remove("visible")
   handleReset()
+}
+
+dismissBtn.addEventListener("click", dismissHalt)
+
+window.addEventListener("keydown", (e: KeyboardEvent) => {
+  if (e.key === "Escape" && haltOverlay.classList.contains("visible")) {
+    dismissHalt()
+  }
 })
 
 // ── Boot ──────────────────────────────────────────────────────
@@ -236,6 +312,7 @@ const expression = codeTextarea.value.trim();
 
     state.assembly = data.assembly
     state.instructions = data.instructions || []
+    state.ram = base64ToBytes(data.ram)
     state.isCompiled = true
     state.isHalted = false
     state.registers = [0,0,0,0]

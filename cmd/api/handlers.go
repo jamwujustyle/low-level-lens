@@ -55,7 +55,12 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 
-	res = CompileResponse{Message: "Compiled Successfully", Assembly: comp.Assembly, Instructions: buildInstructions(comp)}
+	res = CompileResponse{
+		Message:      "Compiled Successfully",
+		Assembly:     comp.Assembly,
+		Instructions: buildInstructions(comp),
+		RAM:          comp.Instructions,
+	}
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -77,6 +82,7 @@ func handleStep(w http.ResponseWriter, r *http.Request) {
 		Registers: gCPU.Registers,
 		PC:        gCPU.PC,
 		Halt:      gCPU.Halt,
+		RAM:       gCPU.RAM,
 	}
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {

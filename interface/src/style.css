@@ -188,7 +188,7 @@ body {
 /* ── Code Input ────────────────────────────────────────────── */
 .code-input__textarea {
   width: 100%;
-  min-height: 200px;
+  height: 160px; /* Fixed height */
   background: var(--bg-input);
   border: 1px solid var(--border);
   padding: 12px;
@@ -275,8 +275,16 @@ body {
 }
 
 .asm-table__body {
-  max-height: 250px;
+  height: 260px; /* Further reduced height */
   overflow-y: auto;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.asm-table__body::-webkit-scrollbar {
+  width: 4px;
+}
+.asm-table__body::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
 }
 
 .asm-row {
@@ -371,17 +379,30 @@ body {
   width: 120px;
   height: 120px;
   border: 2px solid var(--text-primary);
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
   margin: 0 auto;
+  transition: all 0.1s;
 }
 
 .alu__label {
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-.alu--active {
+.alu__op {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  height: 16px; /* Prevent layout shift */
+}
+
+.alu--active .alu__shape {
   background: var(--text-primary);
   color: var(--bg-deep);
 }
@@ -406,6 +427,30 @@ body {
 .control-bar__cycle span {
   color: var(--text-primary);
   font-weight: 700;
+}
+
+/* ── PC Display ────────────────────────────────────────────── */
+.pc-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid var(--text-primary);
+  padding: 4px 8px;
+  background: var(--bg-deep);
+}
+
+.pc-display__label {
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.pc-display__value {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 /* ── Halt Overlay ──────────────────────────────────────────── */
@@ -477,15 +522,52 @@ body {
 /* ── Error Toast ───────────────────────────────────────────── */
 .error-toast {
   position: fixed;
-  bottom: 20px;
+  bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: #fff;
-  color: #000;
-  padding: 10px 20px;
+  background: var(--text-primary);
+  color: var(--bg-deep);
+  padding: 12px 24px;
   font-weight: 700;
   font-size: 12px;
+  z-index: 1000;
+  border: 1px solid var(--bg-deep);
   display: none;
 }
 
 .error-toast.visible { display: block; }
+
+/* ── Memory Hex View ───────────────────────────────────────── */
+.memory-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(32px, 1fr));
+  gap: 4px;
+  margin-top: 10px;
+  max-height: 90px; /* Even tighter */
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.memory-grid::-webkit-scrollbar {
+  width: 4px;
+}
+.memory-grid::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+}
+
+.memory-cell {
+  height: 24px;
+  border: 1px solid var(--border);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+.memory-cell--pc {
+  background: var(--text-primary);
+  color: var(--bg-deep);
+  border-color: var(--text-primary);
+}
+
