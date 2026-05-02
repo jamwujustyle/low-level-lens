@@ -23,11 +23,20 @@ It serves as the final project for:
 
 ## 📂 Project Structure
 
-- `/compiler`: Go-based lexer, parser, AST builder, and assembly code generator.
-- `/vcpu`: Go-based CPU state machine, memory definitions, and custom opcode ISA.
+- `/cmd/api`: Go-based REST API serving the compiler and VCPU endpoints.
+- `/compiler`: Go-based lexer, parser, AST builder, and assembly code generator (includes tests).
+- `/docs`: Project specifications, ISA definition, and progress reports.
 - `/interface`: Vanilla JS/TS frontend for the step-by-step visual execution trace.
-- `/tests`: Test cases encompassing valid, invalid, and extensible scenarios.
-- `SPEC.md`: The complete project requirements, roadmap, and architecture specifications.
+- `/vcpu`: Go-based CPU state machine, memory definitions, and custom opcode ISA.
+- `TEST_REPORT.md` / `test.png`: Final test suite summary and visual evidence of all passing tests.
+
+## 🧪 Testing & Validation
+
+The core Go components (Compiler and Virtual CPU) are thoroughly tested to ensure strict semantic checking, mathematical correctness, and robust error handling.
+
+For a comprehensive breakdown of all valid, invalid, and extensible test cases, please refer to the [Test Report](TEST_REPORT.md).
+
+![Test Suite Output](test.png)
 
 ## 📚 Documentation
 

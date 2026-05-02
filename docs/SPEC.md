@@ -105,11 +105,11 @@ A minimal Register-Based Instruction Set to map AST nodes to CPU operations:
 ## 7. Directory Structure
 ```text
 low-level-lens/
-├── compiler/           # Go: The PoP Project (Lexer, Parser, Codegen, Semantics)
-├── vcpu/               # Go: The Virtual CPU state machine & ISA opcodes
+├── cmd/api/            # Go: REST API server connecting backend with frontend
+├── compiler/           # Go: The PoP Project (Lexer, Parser, Codegen, Semantics, Tests)
+├── docs/               # Project documentation (SPEC, ISA, PROGRESS)
 ├── interface/          # Vanilla JS/TS: The Architecture Visualization UI
-├── tests/              # Test cases (Valid, Invalid, Extensible cases)
-└── SPEC.md             # This specification document
+└── vcpu/               # Go: The Virtual CPU state machine, ISA opcodes, Tests
 ```
 
 ---

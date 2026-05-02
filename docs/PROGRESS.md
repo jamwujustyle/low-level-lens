@@ -35,13 +35,13 @@
 ### 6. Code Generation (Phase 2)
 - **AST Walking**: Implemented recursive tree-walking to translate AST nodes into linear VCPU instructions.
 - **Assembly Logging**: Added human-readable `.asm` generation alongside binary machine code.
-- **Extended ISA**: Successfully implemented a custom `OpExp` (Exponentiation) instruction across the entire stack.
+- **Extended Features**: Added robust semantic checks and word operator handling.
 
 ---
 
-## 🚀 Remaining Tasks
+## ✅ Completed Tasks (Phase 3)
 
 ### 4. UI Interface (Phase 3)
 - [x] **Go Backend API**: Wrapped the Compiler and VCPU in a standard REST HTTP API with CORS and Graceful Shutdown.
 - [x] **Vanilla JS/TS Frontend**: Build the "Slow Motion CPU" dashboard (API integration, DOM linking, and compile rendering successful!).
-- [ ] **Visualization & Execution**: Implement the Step logic, update Registers/PC/Cycles on the UI, and animate the Bus interactions.
+- [x] **Visualization & Execution**: Implemented the Step logic, updated Registers/PC/Cycles on the UI, and animated the Bus interactions.
