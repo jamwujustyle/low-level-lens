@@ -125,11 +125,21 @@ func (p *Parser) parseIntegerLiteral() Expression {
 	var n int64
 	var err error
 	switch strings.ToLower(p.curToken.Literal) {
+	// Roman
 	case "i":
 		n = 1
 	case "v":
 		n = 5
 	case "x":
+		n = 10
+	// Words
+	case "one":
+		n = 1
+	case "two":
+		n = 2
+	case "three":
+		n = 3
+	case "ten":
 		n = 10
 	default:
 		n, err = strconv.ParseInt(p.curToken.Literal, 10, 64)

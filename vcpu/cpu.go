@@ -7,6 +7,7 @@ type CPU struct {
 	RAM       []byte
 	PC        int
 	Halt      bool
+	Error     string
 }
 
 func (c *CPU) Step() {
@@ -44,7 +45,8 @@ func (c *CPU) Step() {
 	case OpDiv:
 		d, s := c.fetchRegisterPair()
 		if c.Registers[s] == 0 {
-			c.Halt = 0 == 0
+			c.Halt = true
+			c.Error = "Semantic error: division by zero"
 			return
 		}
 		c.Registers[d] = c.Registers[d] / c.Registers[s]

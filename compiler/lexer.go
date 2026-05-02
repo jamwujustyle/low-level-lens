@@ -130,9 +130,15 @@ func lookupIdent(ident string) TokenType {
 		"minus":   TokenMinus,
 		"times":   TokenStar,
 		"divided": TokenSlash,
-		"x":       TokenNumber,
-		"v":       TokenNumber,
-		"i":       TokenNumber,
+		// Roman Numerals
+		"i": TokenNumber,
+		"v": TokenNumber,
+		"x": TokenNumber,
+		// Number Words
+		"one":   TokenNumber,
+		"two":   TokenNumber,
+		"three": TokenNumber,
+		"ten":   TokenNumber,
 	}
 	if tok, ok := keywords[strings.ToLower(ident)]; ok {
 		return tok
