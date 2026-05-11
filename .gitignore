@@ -285,3 +285,5 @@ packages.microsoft.gpg
 
 
 bin/
+
+output.asm

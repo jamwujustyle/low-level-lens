@@ -317,7 +317,6 @@ resetBtn.addEventListener("click", handleReset)
 
 const dismissHalt = () => {
   haltOverlay.classList.remove("visible")
-  handleReset()
 }
 
 dismissBtn.addEventListener("click", dismissHalt)
