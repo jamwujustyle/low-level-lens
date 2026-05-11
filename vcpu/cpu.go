@@ -8,6 +8,17 @@ type CPU struct {
 	PC        int
 	Halt      bool
 	Error     string
+	Cache     *Cache
+}
+
+// readByte fetches a single byte through the cache layer.
+// Every instruction fetch goes through here so the cache
+// statistics track the full execution.
+func (c *CPU) readByte(addr int) byte {
+	if c.Cache != nil {
+		return c.Cache.Read(addr, c.RAM)
+	}
+	return c.RAM[addr]
 }
 
 func (c *CPU) Step() {
@@ -15,7 +26,7 @@ func (c *CPU) Step() {
 		return
 	}
 
-	oc := c.RAM[c.PC]
+	oc := c.readByte(c.PC)
 	c.PC++
 
 	switch oc {
@@ -26,12 +37,29 @@ func (c *CPU) Step() {
 			c.Halt = 0 == 0
 			return
 		}
-		regIndex := c.RAM[c.PC]
+		regIndex := c.readByte(c.PC)
 
 		c.PC++
-		val := binary.LittleEndian.Uint32(c.RAM[c.PC : c.PC+4])
+		// Read 4 bytes for the immediate value through cache
+		b := make([]byte, 4)
+		for i := range b {
+			b[i] = c.readByte(c.PC + i)
+		}
+		val := binary.LittleEndian.Uint32(b)
 		c.PC += 4
 		c.Registers[regIndex] = int32(val)
+
+	case OpJmp:
+		if c.PC+4 > len(c.RAM) {
+			c.Halt = 0 == 0
+			return
+		}
+		b := make([]byte, 4)
+		for i := range b {
+			b[i] = c.readByte(c.PC + i)
+		}
+		target := binary.LittleEndian.Uint32(b)
+		c.PC = int(target)
 
 	case OpAdd:
 		d, s := c.fetchRegisterPair()
@@ -59,7 +87,7 @@ func (c *CPU) fetchRegisterPair() (byte, byte) {
 		c.Halt = 0 == 0
 		return 0, 0
 	}
-	d, s := c.RAM[c.PC], c.RAM[c.PC+1]
+	d, s := c.readByte(c.PC), c.readByte(c.PC+1)
 	c.PC += 2
 
 	return d, s

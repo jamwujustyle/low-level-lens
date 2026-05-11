@@ -18,9 +18,17 @@ type CompileResponse struct {
 	RAM          []byte        `json:"ram"`
 }
 
+type CacheStats struct {
+	Hits    int     `json:"hits"`
+	Misses  int     `json:"misses"`
+	HitRate float64 `json:"hitRate"`
+	Enabled bool    `json:"enabled"`
+}
+
 type StepResponse struct {
-	Registers [4]int32 `json:"registers"`
-	PC        int      `json:"pc"`
-	Halt      bool     `json:"halt"`
-	RAM       []byte   `json:"ram"`
+	Registers [4]int32   `json:"registers"`
+	PC        int        `json:"pc"`
+	Halt      bool       `json:"halt"`
+	RAM       []byte     `json:"ram"`
+	Cache     CacheStats `json:"cache"`
 }

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"os"
+	"strings"
 
 	c "github.com/jamwujustyle/low-level-lens/compiler"
 	"github.com/jamwujustyle/low-level-lens/vcpu"
@@ -51,7 +53,14 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 	comp.Compile(tree, 0)
 	comp.Emit(vcpu.OpHalt)
 
-	gCPU = &vcpu.CPU{RAM: comp.Instructions}
+	// Create CPU with a direct-mapped cache:
+	// 4 lines × 8-byte blocks = 32 bytes of cache
+	cache := vcpu.NewCache(4, 8)
+	gCPU = &vcpu.CPU{RAM: comp.Instructions, Cache: cache}
+
+	// Overwrite output.asm with the latest assembly
+	asmContent := strings.Join(comp.Assembly, "\n") + "\n"
+	os.WriteFile("output.asm", []byte(asmContent), 0644)
 
 	w.Header().Set("Content-Type", "application/json")
 
@@ -78,11 +87,23 @@ func handleStep(w http.ResponseWriter, r *http.Request) {
 	}
 	gCPU.Step()
 
+	// Build cache stats for the response
+	cacheStats := CacheStats{Enabled: gCPU.Cache != nil}
+	if gCPU.Cache != nil {
+		cacheStats.Hits = gCPU.Cache.Hits
+		cacheStats.Misses = gCPU.Cache.Misses
+		total := cacheStats.Hits + cacheStats.Misses
+		if total > 0 {
+			cacheStats.HitRate = float64(cacheStats.Hits) / float64(total) * 100
+		}
+	}
+
 	res := StepResponse{
 		Registers: gCPU.Registers,
 		PC:        gCPU.PC,
 		Halt:      gCPU.Halt,
 		RAM:       gCPU.RAM,
+		Cache:     cacheStats,
 	}
 
 	if err := json.NewEncoder(w).Encode(&res); err != nil {

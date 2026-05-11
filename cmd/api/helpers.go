@@ -42,6 +42,8 @@ func buildInstructions(comp *c.Compiler) []Instruction {
 			offset += 6
 		case vcpu.OpAdd, vcpu.OpSub, vcpu.OpMul, vcpu.OpDiv:
 			offset += 3
+		case vcpu.OpJmp:
+			offset += 5
 		case vcpu.OpHalt:
 			offset += 1
 		default:
