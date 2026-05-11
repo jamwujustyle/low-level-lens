@@ -12,6 +12,7 @@ let state: AppState = {
     cycle: 0,
     isCompiled: false,
     isHalted: false,
+    cache: { hits: 0, misses: 0, hitRate: 0, enabled: false },
 }
 
 const codeTextarea = document.getElementById("code-textarea") as HTMLTextAreaElement
@@ -56,6 +57,14 @@ const phaseFetch = document.getElementById("phase-fetch") as HTMLDivElement
 const phaseDecode = document.getElementById("phase-decode") as HTMLDivElement
 const phaseExecute = document.getElementById("phase-execute") as HTMLDivElement
 
+// Cache DOM
+const cacheHitsEl = document.getElementById("cache-hits") as HTMLSpanElement
+const cacheMissesEl = document.getElementById("cache-misses") as HTMLSpanElement
+const cacheRateEl = document.getElementById("cache-rate") as HTMLSpanElement
+const cacheRateBar = document.getElementById("cache-rate-bar") as HTMLDivElement
+const cachePanel = document.getElementById("cache-panel") as HTMLDivElement
+const cacheEventEl = document.getElementById("cache-event") as HTMLDivElement
+
 // ── Application State ─────────────────────────────────────────
 // This is your "single source of truth". Every time the API
 // returns data, update this state, then call render().
@@ -63,6 +72,8 @@ const phaseExecute = document.getElementById("phase-execute") as HTMLDivElement
 // 🏗️ TODO: You'll mutate these values inside your fetch handlers.
 //
 
+let prevCacheHits = 0
+let prevCacheMisses = 0
 
 // ── Helpers ───────────────────────────────────────────────────
 function base64ToBytes(base64: string): number[] {
@@ -192,6 +203,37 @@ function render(): void {
     phaseFetch.classList.add("active")
   }
 
+  // 5. Cache Panel
+  if (cachePanel) {
+    if (state.cache.enabled) {
+      cachePanel.style.display = "block"
+      cacheHitsEl.textContent = state.cache.hits.toString()
+      cacheMissesEl.textContent = state.cache.misses.toString()
+      cacheRateEl.textContent = state.cache.hitRate.toFixed(1)
+      cacheRateBar.style.width = `${state.cache.hitRate}%`
+      
+      // Determine if this step was a hit or miss by comparing with previous values
+      const wasHit = state.cache.hits > prevCacheHits
+      const wasMiss = state.cache.misses > prevCacheMisses
+
+      if (wasHit && !wasMiss && state.cycle > 0) {
+        cacheEventEl.textContent = "HIT"
+        cacheEventEl.className = "cache-event cache-event--hit"
+      } else if (wasMiss && state.cycle > 0) {
+        cacheEventEl.textContent = "MISS"
+        cacheEventEl.className = "cache-event cache-event--miss"
+      } else {
+        cacheEventEl.textContent = ""
+        cacheEventEl.className = "cache-event"
+      }
+
+      prevCacheHits = state.cache.hits
+      prevCacheMisses = state.cache.misses
+    } else {
+      cachePanel.style.display = "none"
+    }
+  }
+
   if (state.isHalted) {
     cpuStatus.textContent = "Halted"
     cpuStatus.className = "status-badge status-badge--halted"
@@ -226,6 +268,7 @@ async function handleStep(): Promise<void> {
     state.pc = data.pc
     state.isHalted = data.halt
     state.ram = base64ToBytes(data.ram)
+    state.cache = data.cache
     state.cycle++
     
     render()
@@ -248,7 +291,10 @@ async function handleReset(): Promise<void> {
       cycle: 0,
       isCompiled: false,
       isHalted: false,
+      cache: { hits: 0, misses: 0, hitRate: 0, enabled: false },
     }
+    prevCacheHits = 0
+    prevCacheMisses = 0
     
     codeTextarea.value = ""
     haltOverlay.classList.remove("visible")
@@ -318,6 +364,9 @@ const expression = codeTextarea.value.trim();
     state.registers = [0,0,0,0]
     state.pc = 0
     state.cycle = 0
+    state.cache = { hits: 0, misses: 0, hitRate: 0, enabled: true }
+    prevCacheHits = 0
+    prevCacheMisses = 0
     
     stepBtn.disabled = false
     resetBtn.disabled = false

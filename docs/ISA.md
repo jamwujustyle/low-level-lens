@@ -12,6 +12,7 @@ It serves as the contract between the Compiler (which generates these instructio
     *   `R3`
 *   **Program Counter (PC)**: Points to the current instruction in memory.
 *   **Memory**: A linear array of bytes representing RAM.
+*   **Cache**: A direct-mapped cache (4 lines × 8-byte blocks) sitting between the CPU and RAM. All instruction fetches go through the cache, tracking hits and misses.
 
 ## Instruction Set
 
@@ -24,6 +25,7 @@ The VCPU uses a simple, register-based instruction set. Each instruction has a m
 | `SUB Rx, Ry`   | `0x03`       | Subtract `Ry` from `Rx` and store the result in `Rx`.                       |
 | `MUL Rx, Ry`   | `0x04`       | Multiply `Rx` by `Ry` and store the result in `Rx`.                         |
 | `DIV Rx, Ry`   | `0x05`       | Divide `Rx` by `Ry` and store the result in `Rx`. (Handles division by zero)|
+| `JMP addr`     | `0x06`       | Unconditional jump to the given address. Used for loops.                     |
 | `HALT`         | `0xFF`       | Stop CPU execution.                                                         |
 
 ## Execution Flow Example

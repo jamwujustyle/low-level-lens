@@ -13,11 +13,19 @@ interface CompileResponse {
     ram: string; // Base64 encoded
 }
 
+interface CacheStats {
+    hits: number;
+    misses: number;
+    hitRate: number;
+    enabled: boolean;
+}
+
 interface StepResponse {
     registers: number[];
     pc: number;
     halt: boolean;
     ram: string; // Base64 encoded
+    cache: CacheStats;
 }
 
 interface AppState {
@@ -29,6 +37,7 @@ interface AppState {
     cycle: number;
     isCompiled: boolean;
     isHalted: boolean;
+    cache: CacheStats;
 }
 
-export type { AppState, StepResponse, CompileResponse, Instruction }
+export type { AppState, StepResponse, CompileResponse, Instruction, CacheStats }
