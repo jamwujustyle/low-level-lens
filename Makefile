@@ -1,4 +1,4 @@
-BACKEND_BIN := /bin/api
+BACKEND_BIN := ./bin/api
 FRONTEND_DIR := ./interface
 
 .DEFAULT_GOAL := check
