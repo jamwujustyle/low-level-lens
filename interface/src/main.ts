@@ -205,33 +205,28 @@ function render(): void {
 
   // 5. Cache Panel
   if (cachePanel) {
-    if (state.cache.enabled) {
-      cachePanel.style.display = "block"
-      cacheHitsEl.textContent = state.cache.hits.toString()
-      cacheMissesEl.textContent = state.cache.misses.toString()
-      cacheRateEl.textContent = state.cache.hitRate.toFixed(1)
-      cacheRateBar.style.width = `${state.cache.hitRate}%`
-      
-      // Determine if this step was a hit or miss by comparing with previous values
-      const wasHit = state.cache.hits > prevCacheHits
-      const wasMiss = state.cache.misses > prevCacheMisses
+    cacheHitsEl.textContent = state.cache.hits.toString()
+    cacheMissesEl.textContent = state.cache.misses.toString()
+    cacheRateEl.textContent = state.cache.hitRate.toFixed(1)
+    cacheRateBar.style.width = `${state.cache.hitRate}%`
+    
+    // Determine if this step was a hit or miss by comparing with previous values
+    const wasHit = state.cache.hits > prevCacheHits
+    const wasMiss = state.cache.misses > prevCacheMisses
 
-      if (wasHit && !wasMiss && state.cycle > 0) {
-        cacheEventEl.textContent = "HIT"
-        cacheEventEl.className = "cache-event cache-event--hit"
-      } else if (wasMiss && state.cycle > 0) {
-        cacheEventEl.textContent = "MISS"
-        cacheEventEl.className = "cache-event cache-event--miss"
-      } else {
-        cacheEventEl.textContent = ""
-        cacheEventEl.className = "cache-event"
-      }
-
-      prevCacheHits = state.cache.hits
-      prevCacheMisses = state.cache.misses
+    if (wasHit && !wasMiss && state.cycle > 0) {
+      cacheEventEl.textContent = "HIT"
+      cacheEventEl.className = "cache-event cache-event--hit"
+    } else if (wasMiss && state.cycle > 0) {
+      cacheEventEl.textContent = "MISS"
+      cacheEventEl.className = "cache-event cache-event--miss"
     } else {
-      cachePanel.style.display = "none"
+      cacheEventEl.textContent = ""
+      cacheEventEl.className = "cache-event"
     }
+
+    prevCacheHits = state.cache.hits
+    prevCacheMisses = state.cache.misses
   }
 
   if (state.isHalted) {

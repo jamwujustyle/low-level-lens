@@ -144,17 +144,21 @@
           </div>
         </section>
 
-        <!-- ── Cache Memory Panel ── -->
-        <section id="cache-panel" class="panel cache-view" style="display: none; grid-column: 1 / -1;">
+        <!-- ── Performance & Cache Panel ── -->
+        <section id="cache-panel" class="panel cache-view">
           <div class="panel__header">
             <div class="panel__title">
               <span class="panel__title-dot" style="background: var(--text-primary)"></span>
-              Cache Memory
+              Performance & Cache
             </div>
             <div id="cache-event" class="cache-event"></div>
           </div>
           <div class="panel__body cache-body">
             <div class="cache-stats">
+              <div class="cache-stat">
+                <span class="cache-stat__label">Cycle</span>
+                <span class="cache-stat__value" id="cycle-count">0</span>
+              </div>
               <div class="cache-stat">
                 <span class="cache-stat__label">Hits</span>
                 <span class="cache-stat__value cache-stat__value--hit" id="cache-hits">0</span>
@@ -174,27 +178,20 @@
                 </div>
               </div>
             </div>
+
+            <!-- Integrated Controls -->
+            <div class="panel-controls">
+              <button id="btn-step" class="btn btn--accent" disabled>
+                ▶ Step Execution
+              </button>
+              <button id="btn-reset" class="btn btn--danger" disabled>
+                ↺ System Reset
+              </button>
+            </div>
           </div>
         </section>
 
       </main>
-
-      <!-- ═══ CONTROL BAR ═══ -->
-      <div class="control-bar">
-        <div class="control-bar__info">
-          <div class="control-bar__cycle">
-            Cycle: <span id="cycle-count">0</span>
-          </div>
-        </div>
-        <div class="btn-group">
-          <button id="btn-step" class="btn btn--accent" disabled>
-            ▶ Step
-          </button>
-          <button id="btn-reset" class="btn btn--danger" disabled>
-            ↺ Reset
-          </button>
-        </div>
-      </div>
 
     </div>
 

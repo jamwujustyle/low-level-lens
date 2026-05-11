@@ -150,9 +150,10 @@ body {
 .dashboard {
   display: grid;
   grid-template-columns: 340px 1fr;
-  grid-template-rows: auto 1fr;
+  grid-template-rows: auto auto; /* Two rows for the two pairs of panels */
   gap: 20px;
   flex: 1;
+  align-items: start;
 }
 
 /* ── Panel ─────────────────────────────────────────────────── */
@@ -250,6 +251,16 @@ body {
 .btn--danger:hover:not(:disabled) {
   border-color: #fff;
   color: #fff;
+}
+
+.btn--accent {
+  background: var(--text-primary);
+  color: var(--bg-deep);
+}
+
+.btn--accent:hover:not(:disabled) {
+  background: transparent;
+  color: var(--text-primary);
 }
 
 .btn-group {
@@ -407,26 +418,18 @@ body {
   color: var(--bg-deep);
 }
 
-/* ── Control Bar ───────────────────────────────────────────── */
-.control-bar {
+/* ── Panel Controls ────────────────────────────────────────── */
+.panel-controls {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px;
-  border: 1px solid var(--border);
-  background: var(--bg-panel);
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
 }
 
-.control-bar__cycle {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.control-bar__cycle span {
-  color: var(--text-primary);
-  font-weight: 700;
+.panel-controls .btn {
+  flex: 1;
+  padding: 12px;
 }
 
 /* ── PC Display ────────────────────────────────────────────── */
@@ -586,10 +589,15 @@ body {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  min-width: 100px;
 }
 
 .cache-stat--wide {
   flex: 1;
+  min-width: 200px;
 }
 
 .cache-stat__label {
@@ -602,17 +610,17 @@ body {
 
 .cache-stat__value {
   font-family: var(--font-mono);
-  font-size: 24px;
+  font-size: 20px;
   font-weight: 900;
   color: var(--text-primary);
 }
 
 .cache-stat__value--hit {
-  color: #a0a0a0;
+  color: var(--text-primary);
 }
 
 .cache-stat__value--miss {
-  color: #606060;
+  color: var(--text-muted);
 }
 
 .cache-stat__unit {
