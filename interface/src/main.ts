@@ -53,9 +53,6 @@ const memoryGrid = document.getElementById("memory-grid") as HTMLDivElement
 const dataBus = document.getElementById("data-bus") as HTMLDivElement
 const aluEl = document.getElementById("alu") as HTMLDivElement
 const aluOp = document.getElementById("alu-op") as HTMLSpanElement
-const phaseFetch = document.getElementById("phase-fetch") as HTMLDivElement
-const phaseDecode = document.getElementById("phase-decode") as HTMLDivElement
-const phaseExecute = document.getElementById("phase-execute") as HTMLDivElement
 
 // Cache DOM
 const cacheHitsEl = document.getElementById("cache-hits") as HTMLSpanElement
@@ -170,22 +167,14 @@ function render(): void {
   pcBadge.style.display = state.isCompiled ? "flex" : "none"
   cycleCount.textContent = state.cycle.toString()
 
-  // 4. CPU Status & Phases
+  // 4. CPU Status
   const currentInst = state.instructions[state.cycle - 1]
-  
-  // Reset phases
-  if (phaseFetch && phaseDecode && phaseExecute) {
-    [phaseFetch, phaseDecode, phaseExecute].forEach(p => p?.classList.remove("active"))
-  }
-  
+
   if (aluEl) aluEl.classList.remove("alu--active")
   if (aluOp) aluOp.textContent = ""
   if (dataBus) dataBus.classList.remove("bus-line--active")
 
   if (state.cycle > 0 && currentInst) {
-    // Trigger "Execute" visuals for the instruction that just ran
-    if (phaseExecute) phaseExecute.classList.add("active")
-    
     // If it was an ALU operation, highlight the ALU
     const isALU = ["ADD", "SUB", "MUL", "DIV"].includes(currentInst.mnemonic)
     if (isALU && aluEl && aluOp) {
@@ -198,9 +187,6 @@ function render(): void {
       dataBus.classList.add("bus-line--active")
       setTimeout(() => dataBus.classList.remove("bus-line--active"), 800)
     }
-  } else if (state.isCompiled && phaseFetch) {
-    // If just compiled, we're ready to "Fetch" the first instruction
-    phaseFetch.classList.add("active")
   }
 
   // 5. Cache Panel

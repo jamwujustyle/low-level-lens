@@ -31,10 +31,10 @@ func (c *CPU) Step() {
 
 	switch oc {
 	case OpHalt:
-		c.Halt = 0 == 0
+		c.Halt = true
 	case OpLoad:
 		if c.PC+5 > len(c.RAM) {
-			c.Halt = 0 == 0
+			c.Halt = true
 			return
 		}
 		regIndex := c.readByte(c.PC)
@@ -51,7 +51,7 @@ func (c *CPU) Step() {
 
 	case OpJmp:
 		if c.PC+4 > len(c.RAM) {
-			c.Halt = 0 == 0
+			c.Halt = true
 			return
 		}
 		b := make([]byte, 4)
@@ -84,7 +84,7 @@ func (c *CPU) Step() {
 }
 func (c *CPU) fetchRegisterPair() (byte, byte) {
 	if c.PC+1 >= len(c.RAM) {
-		c.Halt = 0 == 0
+		c.Halt = true
 		return 0, 0
 	}
 	d, s := c.readByte(c.PC), c.readByte(c.PC+1)
