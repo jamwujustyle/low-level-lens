@@ -53,9 +53,8 @@ func handleCompile(w http.ResponseWriter, r *http.Request) {
 	comp.Compile(tree, 0)
 	comp.Emit(vcpu.OpHalt)
 
-	// Create CPU with a direct-mapped cache:
-	// 4 lines × 8-byte blocks = 32 bytes of cache
-	cache := vcpu.NewCache(4, 8)
+	// 4 lines × 4-byte blocks = 16 bytes of cache
+	cache := vcpu.NewCache(4, 4)
 	gCPU = &vcpu.CPU{RAM: comp.Instructions, Cache: cache}
 
 	// Overwrite output.asm with the latest assembly
